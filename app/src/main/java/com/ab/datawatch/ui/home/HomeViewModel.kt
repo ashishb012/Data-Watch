@@ -52,7 +52,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             trafficStatsTracker.initialize()
             while (true) {
-                _currentSpeed.value = trafficStatsTracker.calculateSpeed()
+                _currentSpeed.value = trafficStatsTracker.calculateSpeed("UI")
                 delay(1000)
             }
         }

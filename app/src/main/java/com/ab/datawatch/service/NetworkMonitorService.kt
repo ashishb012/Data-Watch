@@ -113,7 +113,7 @@ class NetworkMonitorService : Service() {
                     break
                 }
 
-                val speedData = trafficStatsTracker.calculateSpeed()
+                val speedData = trafficStatsTracker.calculateSpeed("SERVICE")
 
                 if (!isNotificationHidden) {
 

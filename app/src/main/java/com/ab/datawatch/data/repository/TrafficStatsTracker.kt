@@ -15,10 +15,10 @@ class TrafficStatsTracker @Inject constructor(
 ) {
     private var inMemoryBaseline: TrafficStatsBaselineEntity? = null
     
-    // Track previous values for instantaneous speed calculation
-    private var prevRxForSpeed: Long = -1
-    private var prevTxForSpeed: Long = -1
-    private var lastSpeedCheckTime: Long = -1
+    // Track previous values for instantaneous speed calculation per caller to avoid delta stealing
+    private val prevRxMap = mutableMapOf<String, Long>()
+    private val prevTxMap = mutableMapOf<String, Long>()
+    private val lastTimeMap = mutableMapOf<String, Long>()
 
     suspend fun initialize() = withContext(Dispatchers.IO) {
         inMemoryBaseline = usageDao.getBaseline()
@@ -30,9 +30,8 @@ class TrafficStatsTracker @Inject constructor(
             return@withContext
         }
         
-        prevRxForSpeed = currentRx
-        prevTxForSpeed = currentTx
-        lastSpeedCheckTime = System.currentTimeMillis()
+        // Initialize base states if needed, but per-caller logic handles it gracefully
+        // We still need to record the absolute baseline for db storage
         
         if (inMemoryBaseline == null || currentRx < inMemoryBaseline!!.lastTotalRxBytes || currentTx < inMemoryBaseline!!.lastTotalTxBytes) {
             // Device likely rebooted, or first run
@@ -51,7 +50,7 @@ class TrafficStatsTracker @Inject constructor(
         }
     }
 
-    fun calculateSpeed(): SpeedData {
+    fun calculateSpeed(callerId: String): SpeedData {
         val currentRx = TrafficStats.getTotalRxBytes()
         val currentTx = TrafficStats.getTotalTxBytes()
         val currentTime = System.currentTimeMillis()
@@ -60,18 +59,22 @@ class TrafficStatsTracker @Inject constructor(
             return SpeedData(0, 0, 0)
         }
         
-        if (prevRxForSpeed == -1L || prevTxForSpeed == -1L || lastSpeedCheckTime == -1L) {
-            prevRxForSpeed = currentRx
-            prevTxForSpeed = currentTx
-            lastSpeedCheckTime = currentTime
+        val prevRx = prevRxMap[callerId] ?: -1L
+        val prevTx = prevTxMap[callerId] ?: -1L
+        val lastTime = lastTimeMap[callerId] ?: -1L
+        
+        if (prevRx == -1L || prevTx == -1L || lastTime == -1L) {
+            prevRxMap[callerId] = currentRx
+            prevTxMap[callerId] = currentTx
+            lastTimeMap[callerId] = currentTime
             return SpeedData(0, 0, 0)
         }
         
-        val timeDiff = currentTime - lastSpeedCheckTime
+        val timeDiff = currentTime - lastTime
         if (timeDiff <= 0) return SpeedData(0, 0, 0)
         
-        var rxDiff = currentRx - prevRxForSpeed
-        var txDiff = currentTx - prevTxForSpeed
+        var rxDiff = currentRx - prevRx
+        var txDiff = currentTx - prevTx
         
         // Handle reboot during tracking
         if (rxDiff < 0) rxDiff = currentRx
@@ -80,9 +83,9 @@ class TrafficStatsTracker @Inject constructor(
         val rxSpeed = (rxDiff * 1000) / timeDiff
         val txSpeed = (txDiff * 1000) / timeDiff
         
-        prevRxForSpeed = currentRx
-        prevTxForSpeed = currentTx
-        lastSpeedCheckTime = currentTime
+        prevRxMap[callerId] = currentRx
+        prevTxMap[callerId] = currentTx
+        lastTimeMap[callerId] = currentTime
         
         // Update baseline tracking
         inMemoryBaseline?.let { baseline ->

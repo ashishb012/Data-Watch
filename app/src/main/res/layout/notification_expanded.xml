@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="↓ 0 B/s"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title"
             android:textSize="16sp"/>
             
         <TextView
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="↑ 0 B/s"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent.Title"
             android:textSize="16sp"/>
     </LinearLayout>
     
@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="📱 Mobile: 0 B"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent"
             android:textSize="12sp"/>
             
         <TextView
@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="📶 WiFi: 0 B"
-            android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
+            android:textAppearance="@android:style/TextAppearance.StatusBar.EventContent"
             android:textSize="12sp"/>
     </LinearLayout>
 </LinearLayout>

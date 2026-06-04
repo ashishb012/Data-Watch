@@ -104,7 +104,7 @@ class NetworkMonitorService : Service() {
                         cachedMobile = todaySummary.totalMobile
                         cachedWifi = todaySummary.totalWifi
                     } catch (e: Exception) { }
-                    delay(10000)
+                    delay(1000)
                 }
             }
 

@@ -67,17 +67,11 @@ class NotificationHelper(private val context: Context) {
             context, 0, intent, PendingIntent.FLAG_IMMUTABLE
         )
 
-        val remoteViews = RemoteViews(context.packageName, R.layout.notification_expanded).apply {
-            setTextViewText(R.id.tv_rx_speed, "↓ $rxSpeed")
-            setTextViewText(R.id.tv_tx_speed, "↑ $txSpeed")
-            setTextViewText(R.id.tv_mobile_data, "📱 Mobile: $mobileData")
-            setTextViewText(R.id.tv_wifi_data, "📶 WiFi: $wifiData")
-        }
-
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
-            .setCustomContentView(remoteViews)
+            .setContentTitle("↓ $rxSpeed     ↑ $txSpeed")
+            .setContentText("📱 Mobile: $mobileData   📶 WiFi: $wifiData")
             .setContentIntent(pendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
 

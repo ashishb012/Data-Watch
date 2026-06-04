@@ -16,6 +16,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.SupervisorJob
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -25,7 +26,7 @@ class NetworkMonitorService : Service() {
     @Inject lateinit var networkStatsRepository: NetworkStatsRepository
     @Inject lateinit var userPreferencesRepository: UserPreferencesRepository
 
-    private val serviceScope = CoroutineScope(Dispatchers.IO + Job())
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var isRunning = false
     private var isNotificationHidden = false
     private lateinit var notificationHelper: NotificationHelper
@@ -71,7 +72,6 @@ class NetworkMonitorService : Service() {
             updateNotificationState()
 
             var dbFlushCounter = 0
-            var summaryTick = 0
             var cachedMobile = 0L
             var cachedWifi = 0L
 
@@ -91,6 +91,17 @@ class NetworkMonitorService : Service() {
                 userPreferencesRepository.notificationHidden.collect { isNotificationHidden = it }
             }
 
+            serviceScope.launch {
+                while (isActive && isRunning) {
+                    try {
+                        val todaySummary = networkStatsRepository.getDailyUsageSummary("").first()
+                        cachedMobile = todaySummary.totalMobile
+                        cachedWifi = todaySummary.totalWifi
+                    } catch (e: Exception) { }
+                    delay(10000)
+                }
+            }
+
             while (isActive && isRunning) {
                 if (!isNotifEnabled) {
                     break
@@ -99,12 +110,6 @@ class NetworkMonitorService : Service() {
                 val speedData = trafficStatsTracker.calculateSpeed()
 
                 if (!isNotificationHidden) {
-                    if (summaryTick % 10 == 0) {
-                        val todaySummary = networkStatsRepository.getDailyUsageSummary("").first()
-                        cachedMobile = todaySummary.totalMobile
-                        cachedWifi = todaySummary.totalWifi
-                    }
-                    summaryTick++
 
                     val bitmap = SpeedIconRenderer.createSpeedBitmap(
                         this@NetworkMonitorService,

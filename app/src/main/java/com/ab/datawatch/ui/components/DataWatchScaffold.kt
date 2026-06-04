@@ -4,6 +4,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -56,9 +59,11 @@ fun DataWatchScaffold(
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
 
+    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
     // One UI standard: 40% of screen height for the top bar
     val headerMaxHeightDp = configuration.screenHeightDp.dp * 0.4f
-    val headerMinHeightDp = 64.dp
+    val headerMinHeightDp = 64.dp + statusBarHeight
     
     val headerMaxHeightPx = with(density) { headerMaxHeightDp.toPx() }
     val headerMinHeightPx = with(density) { headerMinHeightDp.toPx() }
@@ -137,6 +142,7 @@ fun DataWatchScaffold(
                     if (progress > 0.9f) MaterialTheme.colorScheme.surfaceContainer 
                     else MaterialTheme.colorScheme.background
                 )
+                .padding(top = statusBarHeight)
         ) {
             // Navigation Icon (Back Button)
             if (showBackButton) {

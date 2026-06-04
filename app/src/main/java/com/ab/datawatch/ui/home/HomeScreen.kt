@@ -25,8 +25,7 @@ import com.ab.datawatch.util.FormatUtils
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    viewModel: HomeViewModel = hiltViewModel(),
-    onThemeToggle: () -> Unit
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val todaySummary by viewModel.todaySummary.collectAsState()
     val appUsageList by viewModel.appUsageList.collectAsState()
@@ -36,8 +35,7 @@ fun HomeScreen(
     DataWatchScaffold(
         title = "DataWatch",
         navController = navController,
-        showOverflowMenu = true,
-        onThemeToggleClick = onThemeToggle
+        showOverflowMenu = true
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -73,6 +71,7 @@ fun HomeScreen(
             items(appUsageList.take(20)) { app ->
                 AppUsageItem(
                     appName = app.appName,
+                    packageName = app.packageName,
                     usageText = FormatUtils.formatDataSize(app.totalBytes),
                     isSystemApp = app.isSystemApp,
                     onClick = { navController.navigate(Screen.AppDetail.createRoute(app.uid)) }

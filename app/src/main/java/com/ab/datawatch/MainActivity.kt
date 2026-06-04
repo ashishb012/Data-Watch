@@ -1,5 +1,6 @@
 package com.ab.datawatch
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,6 +25,7 @@ import com.ab.datawatch.ui.permissions.PermissionsScreen
 import com.ab.datawatch.ui.settings.SettingsScreen
 import com.ab.datawatch.ui.theme.DataWatchTheme
 import com.ab.datawatch.data.model.ThemeColor
+import com.ab.datawatch.service.NetworkMonitorService
 import com.ab.datawatch.util.PermissionHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -52,30 +55,40 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val context = androidx.compose.ui.platform.LocalContext.current
                     var hasPermissions by androidx.compose.runtime.remember { 
-                        androidx.compose.runtime.mutableStateOf(PermissionHelper.hasUsageStatsPermission(context)) 
+                        androidx.compose.runtime.mutableStateOf(
+                            PermissionHelper.hasUsageStatsPermission(context) && 
+                            PermissionHelper.hasPostNotificationsPermission(context)
+                        ) 
                     }
 
                     if (!hasPermissions) {
-                        PermissionsScreen(onPermissionsGranted = { hasPermissions = true })
+                        PermissionsScreen(onPermissionsGranted = {
+                            hasPermissions = true
+                            
+                            // Start foreground service once permissions are granted
+                            val serviceIntent = android.content.Intent(context, NetworkMonitorService::class.java)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                context.startForegroundService(serviceIntent)
+                            } else {
+                                context.startService(serviceIntent)
+                            }
+                        })
                     } else {
+                        // Start service if it's already granted on boot/launch
+                        androidx.compose.runtime.LaunchedEffect(Unit) {
+                            val serviceIntent = android.content.Intent(context, NetworkMonitorService::class.java)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                context.startForegroundService(serviceIntent)
+                            } else {
+                                context.startService(serviceIntent)
+                            }
+                        }
+
                         val navController = rememberNavController()
                         
                         NavHost(navController = navController, startDestination = Screen.Home.route) {
                             composable(Screen.Home.route) {
-                                HomeScreen(
-                                    navController = navController,
-                                    onThemeToggle = {
-                                        val nextTheme = when (themeColor) {
-                                            ThemeColor.BLUE -> ThemeColor.ORANGE
-                                            ThemeColor.ORANGE -> ThemeColor.GREEN
-                                            ThemeColor.GREEN -> ThemeColor.PURPLE
-                                            ThemeColor.PURPLE -> ThemeColor.BLUE
-                                        }
-                                        kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                                            userPreferencesRepository.setThemeColor(nextTheme)
-                                        }
-                                    }
-                                )
+                                HomeScreen(navController = navController)
                             }
                             composable(Screen.Settings.route) {
                                 SettingsScreen(navController = navController)

@@ -69,10 +69,7 @@ class DailyUsageSnapshotWorker @AssistedInject constructor(
                 .build()
 
             val snapshotRequest = PeriodicWorkRequestBuilder<DailyUsageSnapshotWorker>(
-                repeatInterval = 24, 
-                repeatIntervalTimeUnit = TimeUnit.HOURS,
-                flexInterval = 2,
-                flexTimeUnit = TimeUnit.HOURS
+                24L, TimeUnit.HOURS
             )
                 .setConstraints(constraints)
                 .setBackoffCriteria(

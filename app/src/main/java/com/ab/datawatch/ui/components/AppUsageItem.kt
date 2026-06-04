@@ -14,19 +14,35 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 
 @Composable
 fun AppUsageItem(
     appName: String,
+    packageName: String?,
     usageText: String,
     isSystemApp: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val appIcon = remember(packageName) {
+        try {
+            if (packageName != null) {
+                val drawable = context.packageManager.getApplicationIcon(packageName)
+                drawable.toBitmap(width = 96, height = 96).asImageBitmap()
+            } else null
+        } catch (e: Exception) {
+            null
+        }
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -39,11 +55,20 @@ fun AppUsageItem(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(1f)
         ) {
-            Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
+            if (appIcon != null) {
+                androidx.compose.foundation.Image(
+                    bitmap = appIcon,
+                    contentDescription = appName,
+                    modifier = Modifier.width(32.dp).height(32.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Info,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.width(32.dp).height(32.dp)
+                )
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(

@@ -67,20 +67,11 @@ class NotificationHelper(private val context: Context) {
             context, 0, intent, PendingIntent.FLAG_IMMUTABLE
         )
 
-        val hideIntent = Intent(context, NetworkMonitorService::class.java).apply { action = ACTION_HIDE_NOTIF }
-        val hidePendingIntent = PendingIntent.getService(context, 1, hideIntent, PendingIntent.FLAG_IMMUTABLE)
-
-        val stopIntent = Intent(context, NetworkMonitorService::class.java).apply { action = ACTION_STOP_SERVICE }
-        val stopPendingIntent = PendingIntent.getService(context, 2, stopIntent, PendingIntent.FLAG_IMMUTABLE)
-
         val remoteViews = RemoteViews(context.packageName, R.layout.notification_expanded).apply {
             setTextViewText(R.id.tv_rx_speed, "↓ $rxSpeed")
             setTextViewText(R.id.tv_tx_speed, "↑ $txSpeed")
             setTextViewText(R.id.tv_mobile_data, "📱 Mobile: $mobileData")
             setTextViewText(R.id.tv_wifi_data, "📶 WiFi: $wifiData")
-            
-            setOnClickPendingIntent(R.id.btn_hide_notif, hidePendingIntent)
-            setOnClickPendingIntent(R.id.btn_stop, stopPendingIntent)
         }
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)

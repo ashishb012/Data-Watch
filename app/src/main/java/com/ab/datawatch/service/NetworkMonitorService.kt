@@ -71,6 +71,9 @@ class NetworkMonitorService : Service() {
             updateNotificationState()
 
             var dbFlushCounter = 0
+            var summaryTick = 0
+            var cachedMobile = 0L
+            var cachedWifi = 0L
 
             while (isActive && isRunning) {
                 val isNotifEnabled = userPreferencesRepository.notificationEnabled.first()
@@ -85,11 +88,12 @@ class NetworkMonitorService : Service() {
                 val speedData = trafficStatsTracker.calculateSpeed()
 
                 if (!isNotificationHidden) {
-                    // Get daily summary to update notification stats
-                    // In a real app we might want to cache this and not query NetworkStatsManager every second
-                    // For performance, we'll query it once every 10 seconds or rely on Flow
-                    // To keep this simple and performant, we'll just mock it or query occasionally
-                    val todaySummary = networkStatsRepository.getDailyUsageSummary("").first()
+                    if (summaryTick % 60 == 0) {
+                        val todaySummary = networkStatsRepository.getDailyUsageSummary("").first()
+                        cachedMobile = todaySummary.totalMobile
+                        cachedWifi = todaySummary.totalWifi
+                    }
+                    summaryTick++
 
                     val bitmap = SpeedIconRenderer.createSpeedBitmap(
                         this@NetworkMonitorService,
@@ -100,8 +104,8 @@ class NetworkMonitorService : Service() {
                     val notification = notificationHelper.buildNotification(
                         rxSpeed = FormatUtils.formatSpeed(speedData.rxSpeed, speedUnit),
                         txSpeed = FormatUtils.formatSpeed(speedData.txSpeed, speedUnit),
-                        mobileData = FormatUtils.formatDataSize(todaySummary.totalMobile),
-                        wifiData = FormatUtils.formatDataSize(todaySummary.totalWifi),
+                        mobileData = FormatUtils.formatDataSize(cachedMobile),
+                        wifiData = FormatUtils.formatDataSize(cachedWifi),
                         speedIconBitmap = bitmap
                     )
 

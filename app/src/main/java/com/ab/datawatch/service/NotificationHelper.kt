@@ -70,8 +70,8 @@ class NotificationHelper(private val context: Context) {
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
-            .setContentTitle("↓ $rxSpeed     ↑ $txSpeed")
-            .setContentText("📱 Mobile: $mobileData   📶 WiFi: $wifiData")
+            .setContentTitle("Down: $rxSpeed  UP:  $txSpeed")
+            .setContentText("Mobile: $mobileData  WiFi: $wifiData")
             .setContentIntent(pendingIntent)
             .setVisibility(NotificationCompat.VISIBILITY_SECRET)
 

@@ -20,8 +20,7 @@ object FormatUtils {
         return when {
             value >= GIGA_BYTES -> String.format(Locale.getDefault(), "%.1f G%s", value / GIGA_BYTES.toDouble(), suffixMultiplier)
             value >= MEGA_BYTES -> String.format(Locale.getDefault(), "%.1f M%s", value / MEGA_BYTES.toDouble(), suffixMultiplier)
-            value >= KILO_BYTES -> String.format(Locale.getDefault(), "%.0f K%s", value / KILO_BYTES.toDouble(), suffixMultiplier)
-            else -> "$value $suffixMultiplier"
+            else -> String.format(Locale.getDefault(), "%.1f K%s", value / KILO_BYTES.toDouble(), suffixMultiplier)
         }
     }
 

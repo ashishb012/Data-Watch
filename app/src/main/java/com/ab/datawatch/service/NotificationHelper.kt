@@ -6,9 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Icon
 import android.os.Build
-import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.ab.datawatch.MainActivity
 import com.ab.datawatch.R
@@ -82,6 +80,10 @@ class NotificationHelper(private val context: Context) {
         }
 
         return builder.build()
+    }
+
+    fun updateNotification(notification: Notification) {
+        notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
     fun buildMinimalNotification(): Notification {

@@ -22,7 +22,7 @@ object SpeedIconRenderer {
             typeface = Typeface.DEFAULT_BOLD
         }
 
-        val speedText = FormatUtils.formatSpeed(speedBytesPerSec, unit)
+        val speedText = FormatUtils.formatSpeed(speedBytesPerSec, unit, showDecimals = false)
         val parts = speedText.split(" ")
         
         if (parts.size >= 2) {

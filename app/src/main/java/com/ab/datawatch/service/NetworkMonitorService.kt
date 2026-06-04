@@ -88,7 +88,13 @@ class NetworkMonitorService : Service() {
                 userPreferencesRepository.speedUnit.collect { speedUnit = it }
             }
             serviceScope.launch {
-                userPreferencesRepository.notificationHidden.collect { isNotificationHidden = it }
+                userPreferencesRepository.notificationHidden.collect { hidden ->
+                    val previousHidden = isNotificationHidden
+                    isNotificationHidden = hidden
+                    if (previousHidden != hidden) {
+                        updateNotificationState()
+                    }
+                }
             }
 
             serviceScope.launch {
@@ -125,7 +131,7 @@ class NetworkMonitorService : Service() {
                         speedIconBitmap = bitmap
                     )
 
-                    startForeground(NotificationHelper.NOTIFICATION_ID, notification)
+                    notificationHelper.updateNotification(notification)
                 }
 
                 dbFlushCounter++

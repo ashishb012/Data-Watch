@@ -5,42 +5,7 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-        
-        <TextView
-            android:id="@+id/tv_app_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="DataWatch"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:textColor="?android:attr/textColorPrimary"/>
-            
-        <Button
-            android:id="@+id/btn_hide_notif"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Hide Notif"
-            android:textSize="12sp"
-            android:minHeight="36dp"
-            android:paddingHorizontal="8dp"
-            android:layout_marginEnd="8dp"/>
-            
-        <Button
-            android:id="@+id/btn_stop"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="X"
-            android:textSize="12sp"
-            android:minHeight="36dp"
-            android:minWidth="36dp"
-            android:paddingHorizontal="8dp"/>
-    </LinearLayout>
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -54,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="↓ 0 B/s"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
             android:textSize="16sp"/>
             
         <TextView
@@ -63,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="↑ 0 B/s"
-            android:textColor="?android:attr/textColorPrimary"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
             android:textSize="16sp"/>
     </LinearLayout>
     
@@ -85,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="📱 Mobile: 0 B"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
             android:textSize="12sp"/>
             
         <TextView
@@ -94,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="📶 WiFi: 0 B"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textAppearance="@style/TextAppearance.Compat.Notification.Line2"
             android:textSize="12sp"/>
     </LinearLayout>
 </LinearLayout>

@@ -75,15 +75,26 @@ class NetworkMonitorService : Service() {
             var cachedMobile = 0L
             var cachedWifi = 0L
 
+            var isNotifEnabled = true
+            var speedUnit = com.ab.datawatch.data.model.SpeedUnit.BYTES
+            
+            serviceScope.launch {
+                userPreferencesRepository.notificationEnabled.collect { 
+                    isNotifEnabled = it
+                    if (!it) stopSelf()
+                }
+            }
+            serviceScope.launch {
+                userPreferencesRepository.speedUnit.collect { speedUnit = it }
+            }
+            serviceScope.launch {
+                userPreferencesRepository.notificationHidden.collect { isNotificationHidden = it }
+            }
+
             while (isActive && isRunning) {
-                val isNotifEnabled = userPreferencesRepository.notificationEnabled.first()
                 if (!isNotifEnabled) {
-                    stopSelf()
                     break
                 }
-
-                val speedUnit = userPreferencesRepository.speedUnit.first()
-                isNotificationHidden = userPreferencesRepository.notificationHidden.first()
 
                 val speedData = trafficStatsTracker.calculateSpeed()
 

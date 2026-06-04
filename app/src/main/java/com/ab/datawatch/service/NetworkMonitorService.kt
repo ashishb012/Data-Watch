@@ -88,7 +88,7 @@ class NetworkMonitorService : Service() {
                 val speedData = trafficStatsTracker.calculateSpeed()
 
                 if (!isNotificationHidden) {
-                    if (summaryTick % 60 == 0) {
+                    if (summaryTick % 10 == 0) {
                         val todaySummary = networkStatsRepository.getDailyUsageSummary("").first()
                         cachedMobile = todaySummary.totalMobile
                         cachedWifi = todaySummary.totalWifi

@@ -120,8 +120,7 @@ class NetworkMonitorService : Service() {
                         speedIconBitmap = bitmap
                     )
 
-                    val notificationManager = getSystemService(NOTIFICATION_SERVICE) as android.app.NotificationManager
-                    notificationManager.notify(NotificationHelper.NOTIFICATION_ID, notification)
+                    startForeground(NotificationHelper.NOTIFICATION_ID, notification)
                 }
 
                 dbFlushCounter++
